@@ -1,7 +1,7 @@
 use iced::{
     button, executor, keyboard, pane_grid, scrollable, Align, Application,
-    Button, Column, Command, Container, Element, HorizontalAlignment, Length,
-    PaneGrid, Scrollable, Settings, Subscription, Text,
+    Button, Color, Column, Command, Container, Element, HorizontalAlignment,
+    Length, PaneGrid, Row, Scrollable, Settings, Subscription, Text,
 };
 use iced_native::{event, subscription, Event};
 
@@ -138,13 +138,26 @@ impl Application for Example {
         let focus = self.focus;
         let total_panes = self.panes.len();
 
+        const PANE_ID_COLOR: Color = Color::from_rgb(
+            0xF2 as f32 / 255.0,
+            0xF3 as f32 / 255.0,
+            0xF5 as f32 / 255.0,
+        );
+
         let pane_grid = PaneGrid::new(&mut self.panes, |pane, content| {
             let is_focused = focus == Some(pane);
 
-            let title_bar =
-                pane_grid::TitleBar::new(format!("Pane {}", content.id))
-                    .padding(10)
-                    .style(style::TitleBar { is_focused });
+            let title = Row::with_children(vec![
+                Text::new("Pane").into(),
+                Text::new(content.id.to_string())
+                    .color(PANE_ID_COLOR)
+                    .into(),
+            ])
+            .spacing(5);
+
+            let title_bar = pane_grid::TitleBar::new(title)
+                .padding(10)
+                .style(style::TitleBar { is_focused });
 
             pane_grid::Content::new(content.view(pane, total_panes))
                 .title_bar(title_bar)
